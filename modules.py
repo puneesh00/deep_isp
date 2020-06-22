@@ -92,26 +92,26 @@ def espy(x, d, level, gamma_init, trainable):
     x: input tensor
     '''
 
-    x0=Conv2D(filters=d, kernel_size=1, strides=1, padding='same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
+    x0=Conv2D(filters = d, kernel_size = 1, strides = 1, padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
     x0=BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x0)
     x0=PReLU(shared_axes=[1,2])(x0)
 
-    x1 = dil_out(x0,d,1,gamma_init,trainable)
+    x1 = dil_out(x0, d, 1, gamma_init, trainable)
     x1c = x1
 
     for m in range(level-1):
-      x2 = dil_out(x0,d,m+2,gamma_init,trainable)
-      x2 = Add()([x1,x2])
+      x2 = dil_out(x0, d, m+2, gamma_init, trainable)
+      x2 = Add()([x1, x2])
       x1 = x2
-      x2 = Concatenate(axis=-1)([x1c,x2])
+      x2 = Concatenate(axis = -1)([x1c, x2])
       x1c = x2
 
-    x_out = Add()([x,x2])
+    x_out = Add()([x, x2])
 
     return x_out
 
-def conv(x,ch,k,s,gamma_init,trainable):
+def conv(x, ch, k, s, gamma_init, trainable):
   x = Conv2D(ch, k, strides = s, padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
   x = BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x)
-  x = PReLU(shared_axes=[1,2])(x)
+  x = PReLU(shared_axes = [1,2])(x)
   return x
