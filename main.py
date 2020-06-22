@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-e' ,'--epochs', type = int, default = 100, help = 'number of epochs for training')
 parser.add_argument('-b' ,'--batch_size', type = int, default = 32, help = 'batch size for training')
 parser.add_argument('-l' ,'--log_file', type = str, default = log, help = 'log file name to be saved')
-parser.add_argument('-exp' ,'--experiment_title', type = str, default = isp_learning, help = 'experiment title is used as a folder name to save respective files')
+parser.add_argument('-exp' ,'--experiment_title', type = str, default = isp_learn, help = 'experiment title is used as a folder name to save respective files')
 parser.add_argument('-w' ,'--weights_file', type = str, default = weights , help = 'weight file name to be appended while saving')
 parser.add_argument('-o' ,'--optimizer_weights', type = str, default = opt, help = 'optimizer file name to be appended while saving')
 parser.add_argument('-lr' ,'--learning_rate', type = float, default = 0.0001, help = 'initial learning rate for the optimizer')
@@ -50,6 +50,7 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
 
     train_size = 5000
     bat_per_epo = int(train_size/n_batch)
+    dataset_dir = exp_folder
 
     for i in range(n_epochs):
 

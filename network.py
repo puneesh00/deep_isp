@@ -11,19 +11,22 @@ def network(inp_shape, trainable = True, vgg):
    esp = 4
 
    f1 = 16
+
    f13 = 16
    f3 = 16
+
    f133 = 16
    f33 = 16
    f5 = 16
-   ratio = 2
+
+   ratio = 4
 
    level = 4
    d = 16
    n = d*level + 3
 
    inp = Input(inp_shape)
-   x1 = conv(inp, 3, 3, 1, gamma_init, trainable)
+   x1 = conv(inp, f1+f3+f5, 3, 1, gamma_init, trainable)
    
    x2 = x1
 

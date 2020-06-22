@@ -35,7 +35,7 @@ def inception(inp, f1, f13, f3, f133, f33, f5, gamma_init, trainable):
     f33: no. of feature maps(channels) from 3x3 to 3x3
     f5: no. of feature maps(channels) out from receptive field 5x5
 
-    inp_layer: input tensor
+    inp: input tensor
     '''
 
     x1 = Conv2D(f1, (1,1), strides = (1,1), padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(inp)
