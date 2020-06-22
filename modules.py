@@ -75,12 +75,12 @@ def dil_out(x, d, m, gamma_init, trainable):
 
   '''
   d : no. of feature maps
-  m : dilation rate 
+  m : dilation rate
   x: input tensor
   '''
 
-  x=ZeroPadding2D(padding=2**m)(x)
-  x=Conv2D(filters = d, kernel_size = 3, strides = 1, dilation_rate = m, padding = 'valid', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
+  #x=ZeroPadding2D(padding=2**m)(x)
+  x=Conv2D(filters = d, kernel_size = 3, strides = 1, dilation_rate = m, padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
   x=BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x)
   x=PReLU(shared_axes=[1,2])(x)
   return x
