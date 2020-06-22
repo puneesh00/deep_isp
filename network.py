@@ -24,18 +24,20 @@ def network(inp_shape, trainable = True, vgg):
 
    inp = Input(inp_shape)
    x1 = conv(inp, 3, 3, 1, gamma_init, trainable)
-   x1 = conv(x1, n, 3, 1, gamma_init, trainable)
+   
    x2 = x1
 
-   for m in range(ise):
+   for i in range(ise):
      x1 = rise(x1, f1, f13, f3, f133, f33, f5, ratio, gamma_init, trainable)
 
    x1 = Add()[x1,x2]
+   
+   x1 = conv(x1, n, 3, 1, gamma_init, trainable)
 
-   xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = tuple(input_shape[1:2]+[n-3]))(x1)
-   ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:2]+[3]))(x)
+   xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = tuple(input_shape[1:3]+[n-3]))(x1)
+   ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
 
-   for m in range(esp):
+   for i in range(esp):
      xft = espy(xft, d, level, gamma_init, trainable)
 
    xft = conv(xft, 3, 3, 1, gamma_init, trainable)
