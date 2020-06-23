@@ -2,7 +2,7 @@ from keras.models import Input, Model
 from keras.layers import Add, Lambda, Multiply, Concatenate, UpSampling2D
 import tensorflow as tf
 from modules import *
-
+from keras.applications import sigmoid
 
 def network(inp_shape, trainable = True, vgg):
    gamma_init = tf.random_normal_initializer(1., 0.02)
@@ -36,7 +36,7 @@ def network(inp_shape, trainable = True, vgg):
    x2 = conv_trans(inp, 8, 3, 2, gamma_init, trainable)
    x3 = conv_trans(inp, 8, 5, 2, gamma_init, trainable)
 
-   x1 = Concatenate(axis=-1)([x1,x2,x3])   
+   x1 = Concatenate(axis=-1)([x1,x2,x3])
    x1 = conv(x1, f1+f3+f5, 3, 1, gamma_init, trainable)
    x2 = x1
 
@@ -44,7 +44,7 @@ def network(inp_shape, trainable = True, vgg):
      x1 = rise(x1, f1, f13, f3, f133, f33, f5, ratio, gamma_init, trainable)
 
    x1 = Add()[x1,x2]
-   
+
    x1 = conv(x1, n, 3, 1, gamma_init, trainable)
 
    xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = tuple(input_shape[1:3]+[n-3]))(x1)
@@ -56,6 +56,7 @@ def network(inp_shape, trainable = True, vgg):
    xft = conv(xft, 3, 3, 1, gamma_init, trainable)
    xft = Multiply()([xft,ximg])
    x_out = Add()([xft,ximg])
+   x_out = sigmoid()(x_out)
 
    model = Model(inputs = inp, outputs = [x_out, x_out, x_out, vgg(x_out)])
 
