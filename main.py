@@ -30,6 +30,7 @@ weights_file = args.weights_file
 lr = args.learning_rate
 opt_file = args.optimizer_weights
 exp_folder = args.experiment_title
+dataset_dir = exp_folder
 
 current_path = os.getcwd()
 os.mkdir(os.path.join(current_path, exp_folder))
@@ -46,11 +47,10 @@ def color(y_true, y_pred):
   ca_mean = tf.reduce_mean(color_angle)
   return ca_mean
 
-def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file):
+def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file, dataset_dir):
 
     train_size = 5000
     bat_per_epo = int(train_size/n_batch)
-    dataset_dir = exp_folder
 
     for i in range(n_epochs):
 
@@ -88,8 +88,9 @@ d_model.summary()
 d_par = multi_gpu_model(d_model, gpus = 4, cpu_relocation = True)
 opt = Adam(lr = lr, beta_1 = 0.5)
 d_par.compile(loss = ['mae', mssim, color, 'mse'], optimizer = opt, loss_weights = [0.01, 20.0, 1.0, 10.0])
+d_par.summary()
 
 f = open(os.path.join(current_path, exp_folder, log_file + '.txt'), 'x')
 f = open(os.path.join(current_path, exp_folder, log_file + '.txt'), 'a')
 
-train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file)
+train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file, dataset_dir)
