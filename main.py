@@ -79,7 +79,7 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
 
 in_shape = (224,224,4)
 
-base_vgg = VGG16(weights = 'imagenet', include_top = False, input_shape = (224,224,3))
+base_vgg = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,448,3))
 vgg = Model(inputs = base_vgg.input, outputs = base_vgg.get_layer('block4_pool').output)
 vgg.summary()
 
