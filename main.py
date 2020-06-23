@@ -1,3 +1,4 @@
+
 from network import network
 import tensorflow as tf
 import numpy as np
@@ -38,15 +39,19 @@ current_path = os.getcwd()
 os.mkdir(os.path.join(current_path, exp_folder))
 
 def mssim(y_true, y_pred):
-  costs = 1.0 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+  costs = 1.0 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
   return costs
 
 def color(y_true, y_pred):
-  ytn = K.l2_normalize(y_true, axis = -1)
-  ypn = K.l2_normalize(y_pred, axis = -1)
+  #e = tf.math.scalar_mul(1e-7, tf.ones_like(y_true))
+  #y_true = tf.math.add(y_true,e)
+  #y_pred = tf.math.add(y_true,e)
+  ytn = tf.math.l2_normalize(y_true, axis = -1, epsilon=1e-9)
+  ypn = tf.math.l2_normalize(y_pred, axis = -1, epsilon=1e-9)
   color_cos = tf.einsum('aijk,aijk->aij', ytn, ypn)
-  color_angle = tf.math.acos(color_cos)
-  ca_mean = tf.reduce_mean(color_angle)
+  #color_cos = tf.clip_by_value(color_cos, -1, 1)
+  #color_angle = tf.math.acos(color_cos)
+  ca_mean = 1.0 - tf.reduce_mean(color_cos)
   return ca_mean
 
 def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file, dataset_dir):
@@ -66,9 +71,9 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
 
             d_loss = d_par.train_on_batch(X_in,[X_real, X_real, X_real, vgg.predict(X_real)])
 
-            f.write('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.3f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
+            f.write('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
             f.write('\n')
-            print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.3f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
+            print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
         filename = os.path.join(current_path, exp_folder, weights_file + '_%04d.h5' % (i+1))
         d_save = d_par.get_layer('model_2')
         d_save.save_weights(filename)
@@ -82,14 +87,17 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
 in_shape = (224,224,4)
 
 base_vgg = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,448,3))
-vgg = Model(inputs = base_vgg.input, outputs = base_vgg.get_layer('block4_pool').output)
+vgg1 = Model(inputs = base_vgg.input, outputs = base_vgg.get_layer('block4_pool').output)
+for layer in vgg1.layers:
+     layer.trainable = False
+vgg = multi_gpu_model(vgg1, gpus =4, cpu_relocation = True)
 vgg.summary()
 
-d_model = network(vgg, inp_shape = in_shape, trainable = True)
+d_model = network(vgg1, inp_shape = in_shape, trainable = True)
 d_model.summary()
 d_par = multi_gpu_model(d_model, gpus = 4, cpu_relocation = True)
 opt = Adam(lr = lr, beta_1 = 0.5)
-d_par.compile(loss = ['mae', mssim, color, 'mse'], optimizer = opt, loss_weights = [0.01, 20.0, 1.0, 10.0])
+d_par.compile(loss = ['mae', mssim, color, 'mse'], optimizer = opt, loss_weights = [10.0, 10.0, 5.0, 100.0])
 d_par.summary()
 
 f = open(os.path.join(current_path, exp_folder, log_file + '.txt'), 'x')
