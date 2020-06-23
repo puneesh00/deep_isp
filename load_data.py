@@ -43,8 +43,8 @@ def load_training_batch(dataset_dir, TRAIN_SIZE, PATCH_WIDTH, PATCH_HEIGHT, DSLR
         train_data[i, :] = I
 
         I = np.asarray(Image.open(train_directory_dslr + str(img) + '.jpg'))
-        I = misc.imresize(I, DSLR_SCALE / 2, interp='bicubic')
-        I = np.float16(np.reshape(I, [1, int(PATCH_WIDTH * DSLR_SCALE), int(PATCH_HEIGHT * DSLR_SCALE), 3])) / 255
+        #I = misc.imresize(I, DSLR_SCALE / 2, interp='bicubic')
+        I = np.float16(np.reshape(I, [1, int(2*PATCH_WIDTH*DSLR_SCALE), int(2*PATCH_HEIGHT * DSLR_SCALE), 3])) / 255
         train_answ[i, :] = I
 
         i += 1
