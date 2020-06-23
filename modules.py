@@ -1,4 +1,4 @@
-from keras.layers import Conv2D, Dense, GlobalAveragePooling2D, Reshape, Concatenate, Multiply
+from keras.layers import Conv2D, Conv2DTranspose, DepthwiseConv2D, Dense, GlobalAveragePooling2D, Reshape, Concatenate, Multiply
 from keras.layers import PReLU, BatchNormalization, Add
 
 
@@ -112,6 +112,18 @@ def espy(x, d, level, gamma_init, trainable):
 
 def conv(x, ch, k, s, gamma_init, trainable):
   x = Conv2D(ch, k, strides = s, padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
+  x = BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x)
+  x = PReLU(shared_axes = [1,2])(x)
+  return x
+
+def conv_trans(x, ch, k, s, gamma_init, trainable):
+  x = Conv2DTranspose(ch, k, strides = s, padding = 'same', use_bias = True, kernel_initializer = 'he_normal', bias_initializer = 'zeros')(x)
+  x = BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x)
+  x = PReLU(shared_axes = [1,2])(x)
+  return x
+
+def depthwise_conv(x, ch, k, s, gamma_init, trainable):
+  x = DepthwiseConv2D(depth_multiplier=ch, kernel_size=k, strides = s, padding = 'same', use_bias = True, depthwise_initializer = 'he_normal', bias_initializer = 'zeros')(x)
   x = BatchNormalization(gamma_initializer = gamma_init, trainable = trainable)(x)
   x = PReLU(shared_axes = [1,2])(x)
   return x

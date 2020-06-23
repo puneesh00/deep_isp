@@ -1,5 +1,5 @@
 from keras.models import Input, Model
-from keras.layers import Add, Lambda, Multiply
+from keras.layers import Add, Lambda, Multiply, Concatenate, UpSampling2D
 import tensorflow as tf
 from modules import *
 
@@ -26,8 +26,18 @@ def network(inp_shape, trainable = True, vgg):
    n = d*level + 3
 
    inp = Input(inp_shape)
-   x1 = conv(inp, f1+f3+f5, 3, 1, gamma_init, trainable)
-   
+
+   x1 = UpSampling2D()(inp)
+   x2 = depthwise_conv(x1, 2, 3, 1, gamma_init, trainable) #ch=2*in_ch=8
+   x3 = depthwise_conv(x1, 2, 5, 1, gamma_init, trainable)
+   x1 = Concatenate(axis=-1)([x2,x3])
+
+
+   x2 = conv_trans(inp, 8, 3, 1, gamma_init, trainable)
+   x3 = conv_trans(inp, 8, 5, 1, gamma_init, trainable)
+
+   x1 = Concatenate(axis=-1)([x1,x2,x3])   
+   x1 = conv(x1, f1+f3+f5, 3, 1, gamma_init, trainable)
    x2 = x1
 
    for i in range(ise):
@@ -48,4 +58,5 @@ def network(inp_shape, trainable = True, vgg):
    x_out = Add()([xft,ximg])
 
    model = Model(inputs = inp, outputs = [x_out, x_out, x_out, vgg(x_out)])
+
    return model
