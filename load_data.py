@@ -23,8 +23,8 @@ def extract_bayer_channels(raw):
 
 def load_training_batch(dataset_dir, TRAIN_SIZE, PATCH_WIDTH, PATCH_HEIGHT, DSLR_SCALE=1):
 
-    train_directory_dslr = dataset_dir + 'train/canon/'
-    train_directory_phone = dataset_dir + 'train/huawei_raw/'
+    train_directory_dslr = dataset_dir + '/train/canon/'
+    train_directory_phone = dataset_dir + '/train/huawei_raw/'
 
     # NUM_TRAINING_IMAGES = 46839
     NUM_TRAINING_IMAGES = len([name for name in os.listdir(train_directory_phone)
