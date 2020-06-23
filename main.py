@@ -1,4 +1,4 @@
-import network as network
+from network import network
 import tensorflow as tf
 import numpy as np
 import pickle
@@ -44,7 +44,7 @@ def mssim(y_true, y_pred):
 def color(y_true, y_pred):
   ytn = K.l2_normalize(y_true, axis = -1)
   ypn = K.l2_normalize(y_pred, axis = -1)
-  color_cos = tf.einsum('...i,...i->...', ytn, ypn)
+  color_cos = tf.einsum('aijk,aijk->aij', ytn, ypn)
   color_angle = tf.math.acos(color_cos)
   ca_mean = tf.reduce_mean(color_angle)
   return ca_mean
@@ -70,7 +70,7 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
             f.write('\n')
             print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.3f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
         filename = os.path.join(current_path, exp_folder, weights_file + '_%04d.h5' % (i+1))
-        d_save = d_par.get_layer('model_3')
+        d_save = d_par.get_layer('model_2')
         d_save.save_weights(filename)
         del raw
         del canon
@@ -85,7 +85,7 @@ base_vgg = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,4
 vgg = Model(inputs = base_vgg.input, outputs = base_vgg.get_layer('block4_pool').output)
 vgg.summary()
 
-d_model = network(inp_shape = in_shape, trainable = True, vgg)
+d_model = network(vgg, inp_shape = in_shape, trainable = True)
 d_model.summary()
 d_par = multi_gpu_model(d_model, gpus = 4, cpu_relocation = True)
 opt = Adam(lr = lr, beta_1 = 0.5)

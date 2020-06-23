@@ -1,10 +1,10 @@
 from keras.models import Input, Model
-from keras.layers import Add, Lambda, Multiply, Concatenate, UpSampling2D
+from keras.layers import Add, Lambda, Multiply, Concatenate, UpSampling2D, Activation
 import tensorflow as tf
 from modules import *
-from keras.applications import sigmoid
+from keras.activations import sigmoid
 
-def network(inp_shape, trainable = True, vgg):
+def network(vgg, inp_shape, trainable = True):
    gamma_init = tf.random_normal_initializer(1., 0.02)
 
    ise = 8
@@ -43,12 +43,12 @@ def network(inp_shape, trainable = True, vgg):
    for i in range(ise):
      x1 = rise(x1, f1, f13, f3, f133, f33, f5, ratio, gamma_init, trainable)
 
-   x1 = Add()[x1,x2]
+   x1 = Add()([x1,x2])
 
    x1 = conv(x1, n, 3, 1, gamma_init, trainable)
 
-   xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = tuple(input_shape[1:3]+[n-3]))(x1)
-   ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
+   xft = crop(0,n-3)(x1) #xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = (input_shape[1],input_shape[2],)+[n-3] )(x1)
+   ximg = crop(n-3,n)(x1) #ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
 
    for i in range(esp):
      xft = espy(xft, d, level, gamma_init, trainable)
@@ -56,7 +56,7 @@ def network(inp_shape, trainable = True, vgg):
    xft = conv(xft, 3, 3, 1, gamma_init, trainable)
    xft = Multiply()([xft,ximg])
    x_out = Add()([xft,ximg])
-   x_out = sigmoid()(x_out)
+   x_out = Activation(sigmoid)(x_out)
 
    model = Model(inputs = inp, outputs = [x_out, x_out, x_out, vgg(x_out)])
 

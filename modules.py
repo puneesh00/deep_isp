@@ -1,6 +1,13 @@
 from keras.layers import Conv2D, Conv2DTranspose, DepthwiseConv2D, Dense, GlobalAveragePooling2D, Reshape, Concatenate, Multiply
-from keras.layers import PReLU, BatchNormalization, Add
+from keras.layers import PReLU, BatchNormalization, Add, Lambda
 
+def crop(start, end):
+    # Crops (or slices) a Tensor on a given dimension from start to end
+    # example : to crop tensor x[:, :, 5:10]
+    # call slice(2, 5, 10) as you want to crop on the second dimension
+    def func(x):
+       return x[:, :, :, start: end]
+    return Lambda(func)
 
 def squeeze_excite(inp_layer, ratio):
 
@@ -17,7 +24,7 @@ def squeeze_excite(inp_layer, ratio):
     se = Dense(filters // ratio, activation = 'relu', kernel_initializer = 'he_normal', use_bias = True, bias_initializer = 'zeros')(se)
     se = Dense(filters, activation = 'sigmoid', kernel_initializer = 'he_normal', use_bias = True, bias_initializer = 'zeros')(se)
 
-    se = Multiply()[inp_layer, se]
+    se = Multiply()([inp_layer, se])
 
     return se
 
