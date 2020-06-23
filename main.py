@@ -54,7 +54,7 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
 
     for i in range(n_epochs):
 
-        raw, canon = load_training_batch(dataset_dir, train_size, PATCH_WIDTH = 224, PATCH_HEIGHT = 224, DSLR_SCALE = 1)
+        raw, canon = load_training_batch(dataset_dir, train_size, PATCH_WIDTH = 224, PATCH_HEIGHT = 224, DSLR_SCALE = 2)
 
         for j in range(bat_per_epo):
             ix = np.random.randint(0, train_size, n_batch)
