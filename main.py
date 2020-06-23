@@ -16,11 +16,13 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-e' ,'--epochs', type = int, default = 100, help = 'number of epochs for training')
 parser.add_argument('-b' ,'--batch_size', type = int, default = 32, help = 'batch size for training')
-parser.add_argument('-l' ,'--log_file', type = str, default = log, help = 'log file name to be saved')
-parser.add_argument('-exp' ,'--experiment_title', type = str, default = isp_learn, help = 'experiment title is used as a folder name to save respective files')
-parser.add_argument('-w' ,'--weights_file', type = str, default = weights , help = 'weight file name to be appended while saving')
-parser.add_argument('-o' ,'--optimizer_weights', type = str, default = opt, help = 'optimizer file name to be appended while saving')
+parser.add_argument('-l' ,'--log_file', type = str, default = 'log', help = 'log file name to be saved')
+parser.add_argument('-exp' ,'--experiment_title', type = str, default = 'isp_learn', help = 'experiment title is used as a folder name to save respective files')
+parser.add_argument('-w' ,'--weights_file', type = str, default = 'weights' , help = 'weight file name to be appended while saving')
+parser.add_argument('-o' ,'--optimizer_weights', type = str, default = 'opt', help = 'optimizer file name to be appended while saving')
 parser.add_argument('-lr' ,'--learning_rate', type = float, default = 0.0001, help = 'initial learning rate for the optimizer')
+parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/sp-lab-2/isp_learn' , help = 'complete path for the dataset')
+
 
 args = parser.parse_args()
 n_epochs = args.epochs
@@ -30,7 +32,7 @@ weights_file = args.weights_file
 lr = args.learning_rate
 opt_file = args.optimizer_weights
 exp_folder = args.experiment_title
-dataset_dir = exp_folder
+dataset_dir = args.dataset_path
 
 current_path = os.getcwd()
 os.mkdir(os.path.join(current_path, exp_folder))
