@@ -75,7 +75,7 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, w
             f.write('\n')
             print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4]))
         filename = os.path.join(current_path, exp_folder, weights_file + '_%04d.h5' % (i+1))
-        d_save = d_par.get_layer('model_2')
+        d_save = d_par.get_layer('model_3')
         d_save.save_weights(filename)
         del raw
         del canon
