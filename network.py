@@ -10,19 +10,19 @@ def network(vgg, inp_shape, trainable = True):
    ise = 8
    esp = 4
 
-   f1 = 16
+   f1 = 16*2
 
-   f13 = 16
-   f3 = 16
+   f13 = 16*2
+   f3 = 16*2
 
-   f133 = 16
-   f33 = 16
-   f5 = 16
+   f133 = 16*2
+   f33 = 16*2
+   f5 = 16*2
 
    ratio = 4
 
    level = 4
-   d = 16
+   d = 16*2
    n = d*level + 12
 
    inp = Input(inp_shape)
