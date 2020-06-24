@@ -1,5 +1,11 @@
 from keras.layers import Conv2D, Conv2DTranspose, DepthwiseConv2D, Dense, GlobalAveragePooling2D, Reshape, Concatenate, Multiply
 from keras.layers import PReLU, BatchNormalization, Add, Lambda
+import tensorflow as tf
+
+def SubpixelConv2D(scale = 2):
+    def subpixel(x):
+        return tf.depth_to_space(x, scale)
+    return Lambda(subpixel)    
 
 def crop(start, end):
     # Crops (or slices) a Tensor on a given dimension from start to end
