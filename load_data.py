@@ -51,3 +51,29 @@ def load_training_batch(dataset_dir, TRAIN_SIZE, PATCH_WIDTH, PATCH_HEIGHT, DSLR
 
     return train_data, train_answ
 
+
+def load_testing_data(dataset_dir, PATCH_WIDTH, PATCH_HEIGHT, DSLR_SCALE=1):
+
+    test_directory_dslr = dataset_dir + '/test/canon/'
+    test_directory_phone = dataset_dir + '/test/huawei_raw/'
+    
+    NUM_TESTING_IMAGES = len([name for name in os.listdir(test_directory_phone)
+                               if os.path.isfile(os.path.join(test_directory_phone, name))])
+
+    raw_imgs = np.zeros((NUM_TESTING_IMAGES, PATCH_WIDTH, PATCH_HEIGHT, 4))
+    canon_imgs = np.zeros((NUM_TESTING_IMAGES, int(PATCH_WIDTH * DSLR_SCALE), int(PATCH_HEIGHT * DSLR_SCALE), 3))
+
+    i = 0
+    for img in range(NUM_TESTING_IMAGES):
+
+        I = np.asarray(imageio.imread((test_directory_phone + str(img) + '.png')))
+        I = extract_bayer_channels(I)
+        raw_imgs[i, :] = I
+
+        I = np.asarray(Image.open(test_directory_dslr + str(img) + '.jpg'))
+        I = np.float32(np.reshape(I, [1, int(PATCH_WIDTH*DSLR_SCALE), int(PATCH_HEIGHT * DSLR_SCALE), 3])) / 255
+        canon_imgs[i, :] = I
+
+        i += 1
+
+    return raw_imgs, canon_imgs
