@@ -22,7 +22,7 @@ parser.add_argument('-exp' ,'--experiment_title', type = str, default = 'isp_lea
 parser.add_argument('-w' ,'--weights_file', type = str, default = 'weights' , help = 'weight file name to be appended while saving')
 parser.add_argument('-o' ,'--optimizer_weights', type = str, default = 'opt', help = 'optimizer file name to be appended while saving')
 parser.add_argument('-lr' ,'--learning_rate', type = float, default = 0.0001, help = 'initial learning rate for the optimizer')
-parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/sp-lab-2/isp_learn' , help = 'complete path for the dataset')
+parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/puneesh/isp_learn' , help = 'complete path for the dataset')
 
 
 args = parser.parse_args()
