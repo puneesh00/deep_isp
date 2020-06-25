@@ -11,6 +11,7 @@ import os
 from keras.models import Model
 from keras import backend as K
 from load_data import load_training_batch
+from exposure_fusion import exp_map
 
 
 parser = argparse.ArgumentParser()
@@ -36,7 +37,7 @@ exp_folder = args.experiment_title
 dataset_dir = args.dataset_path
 
 #current_path = os.getcwd()
-current_path = /home/sp-lab-2/deep_isp_exps
+current_path = '/home/sp-lab-2/deep_isp_exps'
 os.mkdir(os.path.join(current_path, exp_folder))
 
 def mssim(y_true, y_pred):
@@ -44,16 +45,18 @@ def mssim(y_true, y_pred):
   return costs
 
 def color(y_true, y_pred):
-  #e = tf.math.scalar_mul(1e-7, tf.ones_like(y_true))
-  #y_true = tf.math.add(y_true,e)
-  #y_pred = tf.math.add(y_true,e)
   ytn = tf.math.l2_normalize(y_true, axis = -1, epsilon=1e-9)
   ypn = tf.math.l2_normalize(y_pred, axis = -1, epsilon=1e-9)
   color_cos = tf.einsum('aijk,aijk->aij', ytn, ypn)
-  #color_cos = tf.clip_by_value(color_cos, -1, 1)
-  #color_angle = tf.math.acos(color_cos)
   ca_mean = 1.0 - tf.reduce_mean(color_cos)
   return ca_mean
+
+def exp_map_loss(y_true, y_pred):
+	ytm = exp_map(y_true,1,1,1)
+	ypm = exp_map(y_pred,1,1,1)
+	diff = 1.0 - tf.reduce_mean(tf.math.abs(tf.math.subtract(ytm,ypm)))
+	return diff
+
 
 def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, exp_folder, weights_file, dataset_dir):
 
