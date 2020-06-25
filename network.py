@@ -39,7 +39,7 @@ def network(vgg, inp_shape, trainable = True):
 
    x1 = Concatenate(axis=-1)([x1,x2,x3])
    '''
-   x1 = conv(x1, f1+f3+f5, 3, 1, gamma_init, trainable)
+   x1 = conv(inp, f1+f3+f5, 3, 1, gamma_init, trainable)
    x2 = x1
 
    for i in range(ise):

@@ -4,6 +4,7 @@ import tensorflow as tf
 
 def SubpixelConv2D(scale = 2):
     def subpixel(x):
+        import tensorflow as tf
         return tf.depth_to_space(x, scale)
     return Lambda(subpixel)    
 
