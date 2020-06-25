@@ -28,7 +28,7 @@ weights_file = args.weights_file
 exp_folder = args.experiment_title
 dataset_dir = args.dataset_path
 
-current_path = os.getcwd()
+current_path = '/home/sp-lab-2/deep_isp_exps'
 
 in_shape = (224,224,4)
 

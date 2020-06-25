@@ -6,7 +6,7 @@ def metrics(true_tensor, test_tensor, max_val):
     for i in range(true_tensor.shape[0]): 
 
     	 psnr = measure.compare_psnr(true_tensor[i,:,:,:], test_tensor[i,:,:,:], data_range=max_val)
-    	 ssim = measure.compare_ssim(true_tensor[i,:,:,:], test_tensor[i,:,:,:], data_range=max_val)
+    	 ssim = measure.compare_ssim(true_tensor[i,:,:,:], test_tensor[i,:,:,:], data_range=max_val, multichannel = True)
     	 psnrt = psnrt+psnr
     	 ssimt = ssimt+ssim
 

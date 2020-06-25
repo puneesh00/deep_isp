@@ -35,7 +35,8 @@ opt_file = args.optimizer_weights
 exp_folder = args.experiment_title
 dataset_dir = args.dataset_path
 
-current_path = os.getcwd()
+#current_path = os.getcwd()
+current_path = /home/sp-lab-2/deep_isp_exps
 os.mkdir(os.path.join(current_path, exp_folder))
 
 def mssim(y_true, y_pred):
