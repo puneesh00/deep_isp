@@ -19,7 +19,7 @@ parser.add_argument('-e' ,'--epochs', type = int, default = 100, help = 'number 
 parser.add_argument('-m' ,'--metrics_file', type = str, default = 'metrics', help = 'metrics file name to be saved')
 parser.add_argument('-exp' ,'--experiment_title', type = str, default = 'isp_learn', help = 'experiment title is used as a folder name to save respective files')
 parser.add_argument('-w' ,'--weights_file', type = str, default = 'weights' , help = 'weight file name to be appended while testing')
-parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/sp-lab-2/isp_learn' , help = 'complete path for the dataset')
+parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/puneesh/isp_learn' , help = 'complete path for the dataset')
 
 args = parser.parse_args()
 n_epochs = args.epochs
