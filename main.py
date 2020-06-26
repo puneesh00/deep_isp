@@ -88,8 +88,8 @@ def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, save_path, ex
             symbolic_weights = getattr(d_par.optimizer, 'weights')
             weight_values = K.batch_get_value(symbolic_weights)
             with open(os.path.join(save_path, exp_folder, opt_file + '_%04d.pkl' %(i+1)), 'wb') as f2:
-            pickle.dump(weight_values, f2)
-            f2.close()
+           	 pickle.dump(weight_values, f2)
+           	 f2.close()
             del symbolic_weights
             del weight_values
         del raw
