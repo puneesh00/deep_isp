@@ -7,12 +7,13 @@ def saturation(img):
 	img = tf.math.subtract(img, mean)
 	sat = tf.einsum('aijk,aijk->aij', img, img)
 	sat = tf.math.scalar_mul((1.0/3.0),sat)
+	sat = tf.math.add(sat, tf.math.scalar_mul(1e-7, tf.ones_like(sat)))
 	sat = tf.math.sqrt(sat)
 	return sat
 
 def get_exp(img,c):
-	cimg = tf.slice(img,[0,0,0,c],[img.get_shape()[0],img.get_shape()[1],img.get_shape()[2],1])
-	cimg = tf.squeeze(cimg,axis=-1)
+	#cimg = tf.slice(img,[0,0,0,c],[img.get_shape()[0],img.get_shape()[1],img.get_shape()[2],1])
+	cimg = tf.squeeze(img,axis=-1)
 	m = tf.math.scalar_mul(0.5, tf.ones_like(cimg))
 	cimg = tf.math.subtract(cimg,m)
 	cimg = tf.math.multiply(cimg,cimg)
@@ -20,9 +21,10 @@ def get_exp(img,c):
 	return cimg
 
 def exposure(img):
-	rimg = get_exp(img,0)
-	gimg = get_exp(img,1)
-	bimg = get_exp(img,2)
+	rimg, gimg, bimg = tf.split(img, num_or_size_splits=3, axis=-1)
+	rimg = get_exp(rimg,0)
+	gimg = get_exp(gimg,1)
+	bimg = get_exp(bimg,2)
 	img = tf.math.add(rimg,gimg)
 	img = tf.math.add(img,bimg)
 	exp = tf.math.exp(img)
