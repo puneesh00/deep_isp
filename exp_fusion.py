@@ -30,7 +30,7 @@ def exposure(img):
 
 def contrast(img):
 	mean = tf.keras.backend.mean(img, axis=-1, keepdims=True)
-	lap_fil = [[0,-1,0],[-1,4,-1],[0,-1,0]]
+	lap_fil = [[0.0,-1.0,0.0],[-1.0,4.0,-1.0],[0.0,-1.0,0.0]]
 	lap_fil = tf.expand_dims(lap_fil,-1)
 	lap_fil = tf.expand_dims(lap_fil,-1)
 	con = tf.nn.convolution(mean, lap_fil, padding='SAME')
