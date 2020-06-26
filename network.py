@@ -7,7 +7,7 @@ from keras.activations import sigmoid
 def network(vgg, inp_shape, trainable = True):
    gamma_init = tf.random_normal_initializer(1., 0.02)
 
-   ise = 8
+   ise = 9
    esp = 6
 
    f1 = 16*2
@@ -22,10 +22,10 @@ def network(vgg, inp_shape, trainable = True):
    ratio = 4
 
    level = 4
-   d1 = 16*2
-   n1 = d1*level + 12
+   #d1 = 16*2
+   #n1 = d1*level + 12
 
-   d2 = 16*4
+   d2 = 10*4
    n2 = d2*level
 
    inp = Input(inp_shape)
@@ -50,10 +50,11 @@ def network(vgg, inp_shape, trainable = True):
 
    x1 = Add()([x1,x2])
 
-   x1 = conv(x1, n1, 3, 1, gamma_init, trainable)
-
-   xft = crop(0,n1-12)(x1) #xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = (input_shape[1],input_shape[2],)+[n-3] )(x1)
-   ximg = crop(n1-12,n1)(x1) #ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
+   #x1 = conv(x1, n1, 3, 1, gamma_init, trainable)
+   chan = x1._keras_shape[-1]
+   
+   xft = crop(0, chan-12)(x1) #xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = (input_shape[1],input_shape[2],)+[n-3] )(x1)
+   ximg = crop(chan-12, chan)(x1) #ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
    ximg = SubpixelConv2D()(ximg)
 
    xft = conv(xft, n2, 3, 2, gamma_init, trainable) #reduce size to 112x112
