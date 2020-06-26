@@ -62,6 +62,6 @@ def network(vgg, inp_shape, trainable = True):
    x_out = Add()([xft,ximg])
    x_out = Activation(sigmoid)(x_out)
 
-   model = Model(inputs = inp, outputs = [x_out, x_out, x_out, vgg(x_out)])
+   model = Model(inputs = inp, outputs = [x_out, x_out, x_out, x_out, vgg(x_out)])
 
    return model
