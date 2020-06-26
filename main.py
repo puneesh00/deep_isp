@@ -57,7 +57,8 @@ def color(y_true, y_pred):
   return ca_mean
 
 def exp_fusion(y_true, y_pred):
-    costs = tf.reduce_mean(tf.keras.losses.MAE(exp_map(y_true, 1, 1, 1), exp_map(y_pred, 1, 1, 1)))
+    #costs = tf.reduce_mean(tf.keras.losses.MAE(exp_map(y_true, 1, 1, 1), exp_map(y_pred, 1, 1, 1)))
+    costs = tf.reduce_mean(tf.math.abs(tf.math.subtract(exp_map(y_true, 1, 1, 1), exp_map(y_pred, 1, 1, 1))))
     return costs
 
 def train(d_par, d_model, vgg, n_epochs, n_batch, f, current_path, save_path, exp_folder, weights_file, dataset_dir):
