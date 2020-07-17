@@ -18,3 +18,11 @@ python infer_full.py -path (give full path for the repository) -w weights2_0191.
 ```
 &nbsp; This will generate the output images in a folder results (default name) in the git repository.
 
+#### To infer cropped frames, run the following command:
+
+```
+
+```
+
+
+
