@@ -17,7 +17,7 @@ This code has been tested in Ubuntu 16.04.6 LTS with 4 NVIDIA GeForce GTX 1080 T
 ## How to Use 
 ### Clone the repository:
 ```
-git clone https://github.com/estija/LIME.git
+git clone https://github.com/puneesh00/deep_isp.git
 ```
 ## Testing 
 
