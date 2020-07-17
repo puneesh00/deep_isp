@@ -23,7 +23,7 @@ git clone https://github.com/puneesh00/deep_isp.git
 
 ### Download weights
 
-&nbsp; Download weights for the model, and place them in the cloned git repository. They can be found [here]().
+&nbsp; Download weights for the model, and place them in the cloned git repository. They can be found [here](https://drive.google.com/file/d/1koBr0LwGVOic9WXk7rDmxM1rplAlVbCR/view?usp=sharing).
 
 #### To infer full resolution images, run the following command:
 
