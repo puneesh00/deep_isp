@@ -1,5 +1,6 @@
 
-from network_unet import network
+from network import network as network 
+from network_unet_rrdb_all_en import network as network_en
 import tensorflow as tf
 import numpy as np
 import pickle
@@ -45,7 +46,7 @@ resume_train =  args.resume_train
 resume_opt = args.resume_opt
 
 current_path = os.getcwd()
-
+#if not resume_train:
 if not os.path.exists(os.path.join(save_path, exp_folder)):
     os.mkdir(os.path.join(save_path, exp_folder))
 
@@ -66,7 +67,7 @@ def color(y_true, y_pred):
   return ca_mean
 
 def vgg_loss(y_true, y_pred):
-    cost = tf.reduce_mean(tf.math.square(tf.math.subtract(vgg1(y_true), vgg1(y_pred))))
+    cost = tf.reduce_mean(tf.math.square(tf.math.subtract(vgg2(y_true), vgg2(y_pred))))
     return cost
 
 def exp_fusion(y_true, y_pred):
@@ -80,7 +81,7 @@ def lr_decay(lr, epoch):
     #print(lr)
     return lr
 
-def train(d_par, n_epochs, n_batch, f, current_path, save_path, exp_folder, weights_file, dataset_dir):
+def train(d_par, d_model, n_epochs, n_batch, f, current_path, save_path, exp_folder, weights_file, dataset_dir):
 
     train_size = 5000
     bat_per_epo = int(train_size/n_batch)
@@ -94,14 +95,17 @@ def train(d_par, n_epochs, n_batch, f, current_path, save_path, exp_folder, weig
 
             X_real = canon[ix]
             X_in  = raw[ix]
+            X_in,_,_,_,_ = d_model.predict(X_in)
 
-            d_loss = d_par.train_on_batch(X_in,[X_real, X_real, X_real, X_real, X_real])
+            d_loss = d_par.train_on_batch(X_in,[X_real, X_real, X_real])#, X_real, X_real, vgg.predict(X_real)])
 
-            f.write('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, exp_fus = %.5f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4], d_loss[5]))
+            #f.write('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, exp_fus = %.5f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4], d_loss[5]))
+            f.write('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3]))
             f.write('\n')
-            print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, exp_fus = %.5f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4], d_loss[5]))
+            #print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, color=%.3f, exp_fus = %.5f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3], d_loss[4], d_loss[5]))
+            print('>%d, %d/%d, d=%.3f, mae=%.3f,  mssim=%.3f, vgg=%.5f' %(i+1, j+1, bat_per_epo, d_loss[0], d_loss[1], d_loss[2], d_loss[3]))
         filename = os.path.join(save_path, exp_folder, weights_file + '_%04d.h5' % (i+1))
-        d_save = d_par.get_layer('model_2')
+        d_save = d_par.get_layer('model_4')
         d_save.save_weights(filename)
 
         K.set_value(d_par.optimizer.lr, lr_decay(K.get_value(d_par.optimizer.lr),(i+1)))
@@ -122,37 +126,42 @@ def train(d_par, n_epochs, n_batch, f, current_path, save_path, exp_folder, weig
 
 
 in_shape = (224,224,4)
+in_shape2 = (448,448,3)
 
-base_vgg = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,448,3))
-vgg1 = Model(inputs = base_vgg.input, outputs = base_vgg.get_layer('block4_pool').output)
+base_vgg1 = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,448,3))
+vgg1 = Model(inputs = base_vgg1.input, outputs = base_vgg1.get_layer('block4_pool').output)
 for layer in vgg1.layers:
      layer.trainable = False
 
-d_model = network(inp_shape = in_shape, trainable = True)
-d_model.summary()
+base_vgg2 = VGG16(weights = 'imagenet', include_top = False, input_shape = (448,448,3))
+vgg2 = Model(inputs=base_vgg2.input, outputs=base_vgg2.get_layer('block4_pool').output)
+for layer in vgg2.layers:
+     layer.trainable=False
+#vgg = multi_gpu_model(vgg1, gpus = 4, cpu_relocation = True)
+#vgg.summary()
+file_dis = os.path.join(save_path, exp_folder, resume_weight)
+d_model2 = network(vgg1, inp_shape = in_shape, trainable = False)
+for layer in d_model2.layers:
+     layer.trainable = False
+#d_model.summary()
+d_model2.load_weights(file_dis)
 
-if resume_train:
-	file_dis = os.path.join(save_path, exp_folder, resume_weight)
-	d_model.load_weights(file_dis)
-
+d_model = network_en(inp_shape = in_shape2, trainable = True)
 d_par = multi_gpu_model(d_model, gpus = 4, cpu_relocation = True)
 d_par.summary()
-
-if resume_train:
-	d_par.layers[-6].set_weights(d_model.get_weights())
-
+#d_par.layers[-6].set_weights(d_model.get_weights())
 opt = Adam(lr = lr, beta_1 = 0.5)
-d_par.compile(loss = ['mae', mssim, color, exp_fusion, vgg_loss], optimizer = opt, loss_weights = [5.0, 1.0, 0.5, 0.5, 1.0])
+#d_par.compile(loss = ['mae', mssim, color, exp_fusion, 'mse'], optimizer = opt, loss_weights = [20.0, 10.0, 5.0, 5.0, 100.0])
+d_par.compile(loss = ['mae', mssim, vgg_loss], optimizer = opt, loss_weights = [5.0, 1.0, 0.1])
 d_par.summary()
-
-if resume_train:
-	d_par._make_train_function()
-	file_d_opt = os.path.join(save_path, exp_folder, resume_opt)
-	with open(file_d_opt, 'rb') as f3:
-		weight_values = pickle.load(f3)
-	d_par.optimizer.set_weights(weight_values)
-
+'''
+d_par._make_train_function()
+file_d_opt = os.path.join(save_path, exp_folder, resume_opt)
+with open(file_d_opt, 'rb') as f3:
+	weight_values = pickle.load(f3)
+d_par.optimizer.set_weights(weight_values)
+'''
 f = open(os.path.join(save_path, exp_folder, log_file + '.txt'), 'x')
 f = open(os.path.join(save_path, exp_folder, log_file + '.txt'), 'a')
 
-train(d_par, n_epochs, n_batch, f, current_path, save_path, exp_folder, weights_file, dataset_dir)
+train(d_par, d_model2, n_epochs, n_batch, f, current_path, save_path, exp_folder, weights_file, dataset_dir)
