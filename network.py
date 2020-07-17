@@ -7,8 +7,8 @@ from keras.activations import sigmoid
 def network(vgg, inp_shape, trainable = True):
    gamma_init = tf.random_normal_initializer(1., 0.02)
 
-   ise = 8
-   esp = 4
+   ise = 9
+   esp = 6
 
    f1 = 16*2
 
@@ -22,8 +22,11 @@ def network(vgg, inp_shape, trainable = True):
    ratio = 4
 
    level = 4
-   d = 16*2
-   n = d*level + 12
+   #d1 = 16*2
+   #n1 = d1*level + 12
+
+   d2 = 10*4
+   n2 = d2*level
 
    inp = Input(inp_shape)
 
@@ -47,19 +50,27 @@ def network(vgg, inp_shape, trainable = True):
 
    x1 = Add()([x1,x2])
 
-   x1 = conv(x1, n, 3, 1, gamma_init, trainable)
-
-   xft = crop(0,n-12)(x1) #xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = (input_shape[1],input_shape[2],)+[n-3] )(x1)
-   ximg = crop(n-12,n)(x1) #ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
+   #x1 = conv(x1, n1, 3, 1, gamma_init, trainable)
+   chan = x1._keras_shape[-1]
+   
+   xft = crop(0, chan-12)(x1) #xft = Lambda(lambda x: x[:,:,:,0:n-3], output_shape = (input_shape[1],input_shape[2],)+[n-3] )(x1)
+   ximg = crop(chan-12, chan)(x1) #ximg = Lambda(lambda x: x[:,:,:,n-3:n], output_shape = tuple(input_shape[1:3]+[3]))(x1)
    ximg = SubpixelConv2D()(ximg)
 
+   xft = conv(xft, n2, 3, 2, gamma_init, trainable) #reduce size to 112x112
    for i in range(esp):
-     xft = espy(xft, d, level, gamma_init, trainable)
+     xft = espy(xft, d2, level, gamma_init, trainable)
 
-   xft = conv(xft, 12, 3, 1, gamma_init, trainable)
-   xft = SubpixelConv2D()(xft)
-   xft = Multiply()([xft,ximg])
-   x_out = Add()([xft,ximg])
+   xft = conv(xft, 96, 3, 1, gamma_init, trainable)
+   w1 = crop(0,48)(xft) #112x112x48 for linear terms
+   w2 = crop(48,96)(xft) #112x112x48 for quad. terms
+   w1 = SubpixelConv2D(scale = 4)(w1) #448x448x3
+   w2 = SubpixelConv2D(scale = 4)(w2) #448x448x3
+   xft = Multiply()([w1, ximg])
+   img_sq = Multiply()([ximg, ximg])
+   img_sq = Multiply()([img_sq, w2])
+   x_out = Add()([xft, ximg]) # w1*img + img
+   x_out = Add()([x_out, img_sq]) # w2*img**2 + w1*img + img
    x_out = Activation(sigmoid)(x_out)
 
    model = Model(inputs = inp, outputs = [x_out, x_out, x_out, x_out, vgg(x_out)])
