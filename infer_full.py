@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 #parser.add_argument('-e' ,'--epoch', type = int, default = 100, help = 'epoch number for final inference')
 parser.add_argument('-path' ,'--main_path', type = str, default = '/home/puneesh/deep_isp_exps' , help = 'main path where the result/experiment folders are stored')
 parser.add_argument('-w' ,'--weights_file', type = str, default = 'weights' , help = 'best weight file name (only prefix while evaluating)')
-parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/puneesh/isp_learn' , help = 'complete path for the dataset')
+parser.add_argument('-dataset' ,'--dataset_path', type = str, default = '/home/puneesh/isp_learn/' , help = 'complete path for the dataset')
 parser.add_argument('-res' ,'--results_folder', type = str, default = 'results' , help = 'folder to save inference results')
 
 
