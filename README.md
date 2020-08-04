@@ -24,9 +24,9 @@ git clone https://github.com/puneesh00/deep_isp.git
 ### To train the network, run the following command:
 
 ```
-python main.py -exp isp -dataset (full path to dataset directory) -save (full path to the repository) -
+python main.py -exp isp -dataset (full path to dataset directory) -save (full path to the repository)
 ```
-
+There are additional parameters --resume_weight (name of weight file to resume training from), --resume_train (True if resuming training from some previous epoch), --resume_opt (name of optimizer file to resume training from). Other parameters like epochs, lr, can be changed as required. 
 
 ## Testing 
 
