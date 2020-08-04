@@ -19,6 +19,15 @@ This code has been tested in Ubuntu 16.04.6 LTS with 4 NVIDIA GeForce GTX 1080 T
 ```
 git clone https://github.com/puneesh00/deep_isp.git
 ```
+## Training
+
+### To train the network, run the following command:
+
+```
+python main.py -exp isp -dataset (full path to dataset directory) -save (full path to the repository) -
+```
+
+
 ## Testing 
 
 ### Download weights
