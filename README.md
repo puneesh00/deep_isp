@@ -1,5 +1,14 @@
 # Deep_ISP
 
+This is the official implementation of the solution proposed by team **Eureka** for the AIM 2020 Challenge on Learned Image Signal Processor Pipeline at ECCV 2020. 
+
+* The detailed solution can be found [here](https://arxiv.org/abs/2011.04994).
+
+## Results
+<img width = "100%" src = "assets/raw2rgb.png" />
+
+> **First row**: RAW images, **second row**: RGB images obtained by the proposed method, **third row**: Ground truth images.
+
 ## Pre-requisites
 The code was written with Python 3.6.8 with the following dependencies:
 * cuda release 9.0, V9.0.176
